@@ -12,6 +12,9 @@ num_subject = 20 # subject数
 train_data_dict = [[] for i in range(Samples_sum)]
 val_data_dict = [[] for i in range(Samples_sum)]
 
+# Partial frame sequences
+seg = 0.3
+
 for i in range(Samples_sum): # 遍历每一个样本
     idx_gesture = sample_txt[i][0] # gesture信息
     idx_finger = sample_txt[i][1] # finger信息
@@ -25,8 +28,8 @@ for i in range(Samples_sum): # 遍历每一个样本
                     + '/subject_' + str(idx_subject) + '/essai_' + str(idx_essai) + '/skeleton_world.txt'  # 骨骼txt路径
 
     skeleton_data = np.loadtxt(skeleton_path)  # 读取骨骼txt文件
-    skeleton_data = skeleton_data[begin_frame:end_frame + 1, :]  # 取有效帧
-    skeleton_data = skeleton_data.reshape([T, 22, 3])  # T*66 reshape to T*N*C(T*22*3) # 维度变换
+    skeleton_data = skeleton_data[begin_frame:end_frame + 1, :]  # 取有效帧  # selects frames
+    skeleton_data = skeleton_data.reshape([T, 22, 3])  # T*66 reshape to T*N*C(T*22*3) # 维度变换 # reshapes
 
 
     file_name = "g" + str(idx_gesture).zfill(2) + "f" + str(idx_finger).zfill(2) + "s" + str(idx_subject).zfill(
