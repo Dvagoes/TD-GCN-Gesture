@@ -23,7 +23,8 @@ for i in range(Samples_sum): # 遍历每一个样本
     idx_essai = sample_txt[i][3] # essai信息
     begin_frame = sample_txt[i][4] # 开始有效帧
     end_frame = sample_txt[i][5] # 结束有效帧
-    T = end_frame - begin_frame + 1  # 单个样本的帧数
+    T = np.floor((end_frame - begin_frame + 1) * (1 + ext))  # 单个样本的帧数
+    end_frame = begin_frame + T
 
     skeleton_path = root_dataset_path + '/gesture_' + str(idx_gesture) + '/finger_' + str(idx_finger) \
                     + '/subject_' + str(idx_subject) + '/essai_' + str(idx_essai) + '/skeleton_world.txt'  # 骨骼txt路径
