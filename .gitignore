@@ -1,1 +1,10 @@
 /data/ntu/nturgb+d_skeletons
+/data/DHG14-28/DHG14-28_dataset
+/data/DHG14-28/DHG14-28_sample_json
+/data/DHG14-28/DHG14-28_active
+/data/DHG14-28/DHG14-28_over
+/data/DHG14-28/DHG14-28_part_fwd
+/data/DHG14-28/DHG14-28_part_bwd
+/data/DHG14-28/DHG14-28_vary_reg
+/data/DHG14-28/DHG14-28_vary_rnd
+/work_dir

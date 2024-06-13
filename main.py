@@ -28,9 +28,9 @@ from tqdm import tqdm
 from torchlight import DictAction
 
 
-import resource
-rlimit = resource.getrlimit(resource.RLIMIT_NOFILE)
-resource.setrlimit(resource.RLIMIT_NOFILE, (2048, rlimit[1]))
+#import rsrc as resource
+#rlimit = resource.getrlimit(resource.RLIMIT_NOFILE)
+#resource.setrlimit(resource.RLIMIT_NOFILE, (2048, rlimit[1]))
 
 def init_seed(seed):
     torch.cuda.manual_seed_all(seed)
@@ -571,8 +571,11 @@ if __name__ == '__main__':
     # load arg form config file
     p = parser.parse_args()
     if p.config is not None:
-        with open(p.config, 'r') as f:
-            default_arg = yaml.safe_load(f)
+        with open(p.config, 'r', encoding="utf-8") as f: # needs to declare encoding as utf
+            try:
+                default_arg = yaml.safe_load(f)
+            except yaml.YAMLError as exc:
+                print(exc)
         key = vars(p).keys()
         for k in default_arg.keys():
             if k not in key:

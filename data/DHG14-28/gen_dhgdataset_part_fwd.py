@@ -8,7 +8,7 @@ root_dataset_path = './DHG14-28_dataset' # 数据集根目录
 sample_information_txt = root_dataset_path + '/informations_troncage_sequences.txt' # 样本信息txt文件
 
 try:
-  os.mkdir("DHG14-28_over")
+  os.mkdir("DHG14-28_part_fwd")
 except OSError as error:
   print(error)
 
@@ -20,9 +20,8 @@ num_subject = 20 # subject数
 train_data_dict = [[] for i in range(Samples_sum)]
 val_data_dict = [[] for i in range(Samples_sum)]
 
-# Oversize gesture frame sequence
-
-ext = 1.2
+# Partial frame sequences
+ext = 0.2
 
 for i in range(Samples_sum): # 遍历每一个样本
     idx_gesture = sample_txt[i][0] # gesture信息
@@ -31,20 +30,10 @@ for i in range(Samples_sum): # 遍历每一个样本
     idx_essai = sample_txt[i][3] # essai信息
     begin_frame = sample_txt[i][4] # 开始有效帧
     end_frame = sample_txt[i][5] # 结束有效帧
-    T = end_frame - begin_frame + 1 # 单个样本的帧数
+    T = end_frame - begin_frame + 1  # 单个样本的帧数
     diff = int(math.floor(T * ext))
 
-    # should result in >50% of them being extended forwards, and the rest extended backwards
-    if (begin_frame == 0):
-        end_frame = end_frame + diff
-    else:
-        if (random.randint(1,2) == 1):
-            end_frame = end_frame + diff
-        else:
-            begin_frame = begin_frame - diff
-            if (begin_frame < 0):
-                begin_frame = 0
-                
+    begin_frame = begin_frame + diff
     T = end_frame - begin_frame + 1 # 单个样本的帧数
 
     skeleton_path = root_dataset_path + '/gesture_' + str(idx_gesture) + '/finger_' + str(idx_finger) \
@@ -73,27 +62,27 @@ for i in range(Samples_sum): # 遍历每一个样本
     for idx in range(num_subject):
         if idx == int(idx_subject) - 1:
             try:
-              os.mkdir("DHG14-28_over/" + str(idx+1))
+              os.mkdir("DHG14-28_part_fwd/" + str(idx+1))
             except OSError as error:
               print(error)
             try:
-              os.mkdir("DHG14-28_over/" + str(idx+1)+'/val')
+              os.mkdir("DHG14-28_part_fwd/" + str(idx+1)+'/val')
             except OSError as error:
               print(error)
-            with open("./DHG14-28_over/" + str(idx+1)+'/val/' \
+            with open("./DHG14-28_part_fwd/" + str(idx+1)+'/val/' \
                       + file_name + ".json", 'w') as f:
                 json.dump(data_json, f)
             val_data_dict[idx].append(tmp_data_dict)
         else:
             try:
-              os.mkdir("DHG14-28_over/" + str(idx+1))
+              os.mkdir("DHG14-28_part_fwd/" + str(idx+1))
             except OSError as error:
               print(error)
             try:
-              os.mkdir("DHG14-28_over/" + str(idx+1)+'/train')
+              os.mkdir("DHG14-28_part_fwd/" + str(idx+1)+'/train')
             except OSError as error:
               print(error)
-            with open("./DHG14-28_over/" + str(idx+1) + '/train/' \
+            with open("./DHG14-28_part_fwd/" + str(idx+1) + '/train/' \
                       + file_name + ".json", 'w') as f:
                 json.dump(data_json, f)
             train_data_dict[idx].append(tmp_data_dict)
@@ -101,11 +90,11 @@ for i in range(Samples_sum): # 遍历每一个样本
 
 for idx in range(num_subject):
     try:
-      os.mkdir("DHG14-28_over/" + str(idx + 1))
+      os.mkdir("DHG14-28_part_fwd/" + str(idx + 1))
     except OSError as error:
       print(error)
-    with open("./DHG14-28_over/" + str(idx + 1) + "/" + str(idx + 1) + "train_samples.json", 'w') as t1:
+    with open("./DHG14-28_part_fwd/" + str(idx + 1) + "/" + str(idx + 1) + "train_samples.json", 'w') as t1:
         json.dump(train_data_dict[idx], t1)
 
-    with open("./DHG14-28_over/" + str(idx + 1) + "/" + str(idx + 1) + "val_samples.json", 'w') as t2:
+    with open("./DHG14-28_part_fwd/" + str(idx + 1) + "/" + str(idx + 1) + "val_samples.json", 'w') as t2:
         json.dump(val_data_dict[idx], t2)
