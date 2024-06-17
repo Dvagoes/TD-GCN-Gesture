@@ -8,8 +8,8 @@ import random
 class Feeder(Dataset):
     def __init__(self, data_path, label_path, repeat=1, label_flag=28, idx=1, random_choose=True, random_shift=False,
                  random_move=False,
-                 window_size=150, normalization=False, debug=False, use_mmap=True):
-        self.nw_DHG14_28_root = 'data/DHG14-28/DHG14-28_sample_json/'
+                 window_size=150, normalization=False, debug=False, use_mmap=True, nw_DHG14_28_root='data/DHG14-28/DHG14-28_sample_json/'):
+        self.nw_DHG14_28_root = nw_DHG14_28_root
         self.idx = idx
 
         if 'val' in label_path:  
