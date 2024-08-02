@@ -3,7 +3,7 @@ import json
 from torch.utils.data import Dataset
 import numpy as np
 import random
-
+import itertools
 
 class Feeder(Dataset):
     def __init__(self, data_path, label_path, repeat=1, label_flag=28, idx=1, random_choose=True, random_shift=False,
@@ -11,19 +11,23 @@ class Feeder(Dataset):
                  window_size=150, normalization=False, debug=False, use_mmap=True, nw_DHG14_28_root='data/DHG14-28/DHG14-28_sample_json/'):
         self.nw_DHG14_28_root = nw_DHG14_28_root
         self.idx = idx
+        self.data_dict = []
+        for idx in range(1,20):
+            if 'val' in label_path:  
+                self.train_val = 'val'
+                with open(self.nw_DHG14_28_root + str(self.idx) + '/' + str(self.idx) + 'val_samples.json', 'r') as f1:
+                    json_file = json.load(f1)
+                self.data_dict.append(json_file)
+                self.flag = str(self.idx) + '/val/'
+            else:  
+                self.train_val = 'train'
+                with open(self.nw_DHG14_28_root + str(self.idx) + '/' + str(self.idx) + 'train_samples.json', 'r') as f2:
+                    json_file = json.load(f2)
+                self.data_dict.append(json_file)
+                self.flag = str(self.idx) + '/train/'
 
-        if 'val' in label_path:  
-            self.train_val = 'val'
-            with open(self.nw_DHG14_28_root + str(self.idx) + '/' + str(self.idx) + 'val_samples.json', 'r') as f1:
-                json_file = json.load(f1)
-            self.data_dict = json_file
-            self.flag = str(self.idx) + '/val/'  
-        else:  
-            self.train_val = 'train'
-            with open(self.nw_DHG14_28_root + str(self.idx) + '/' + str(self.idx) + 'train_samples.json', 'r') as f2:
-                json_file = json.load(f2)
-            self.data_dict = json_file
-            self.flag = str(self.idx) + '/train/'  
+        #flatten list
+        self.data_dict = flatten(self.data_dict)
 
         
         self.bone = [(1, 2), (3, 1), (4, 3), (5, 4), (6, 5), (7, 2), (8, 7), (9, 8), (10, 9), (11, 2), (12, 11),
@@ -35,7 +39,7 @@ class Feeder(Dataset):
         self.repeat = repeat  
         self.window_size = window_size
         self.label_flag = label_flag  
-        
+        print ('Data Path:', self.nw_DHG14_28_root)
 
         
         self.label = []
@@ -57,6 +61,7 @@ class Feeder(Dataset):
     
     def load_data(self):
         self.data = []  # data: T N C
+        print(self.data_dict)
         for data in self.data_dict:  
             file_name = data['file_name']
             with open(self.nw_DHG14_28_root + self.flag + file_name + '.json', 'r') as f:  
@@ -64,6 +69,8 @@ class Feeder(Dataset):
             skeletons = json_file['skeletons']  
             value = np.array(skeletons)
             self.data.append(value)
+
+    
 
     
     def random_translation(self, ske_data):
@@ -119,7 +126,18 @@ class Feeder(Dataset):
         return data, label, index
 
     def top_k(self, score, top_k):
+        #assert (all(self.label >= 0))
+        #print("Label:", self.label, len(self.label))
+        #label = set(self.label)
+        # print(label)
+        # print("score:", score, len(score))
         rank = score.argsort()
+        # print("Rank:", rank)
+        # hit_top_k= []
+        # for idx, lbl in enumerate(label):
+        #     if lbl in rank[idx, -top_k:]:
+        #         hit_top_k.append(True)
+
 
         hit_top_k = [l in rank[i, -top_k:] for i, l in enumerate(self.label)]
         return sum(hit_top_k) * 1.0 / len(hit_top_k)
@@ -131,3 +149,6 @@ def import_class(name):
     for comp in components[1:]:
         mod = getattr(mod, comp)
     return mod
+
+def flatten(list_of_lists):
+    return list(itertools.chain.from_iterable(list_of_lists))
