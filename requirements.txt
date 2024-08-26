@@ -3,12 +3,9 @@ matplotlib==3.8.3
 numpy==1.22.4
 pandas==2.2.2
 PyYAML==5.4.1
-PyYAML==6.0.2
 scikit_learn==1.4.2
-setuptools==69.1.1
 setuptools==58.1.0
 tensorboardX==2.1
-tensorboardX==2.6.2.2
 torch==1.11.0+cu113
 torchpack==0.2.2
 tqdm==4.53.0
