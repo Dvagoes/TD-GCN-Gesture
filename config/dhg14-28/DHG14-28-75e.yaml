@@ -42,7 +42,7 @@ step: [90, 130] # [90, 130]
 device: 4
 batch_size: 32 # 32
 test_batch_size: 32 # 32
-num_epoch: 75 # 150
+num_epoch: 1 #75 # 150
 nesterov: True
 warm_up_epoch: 20 # 20
 

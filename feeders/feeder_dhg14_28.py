@@ -61,7 +61,7 @@ class Feeder(Dataset):
     
     def load_data(self):
         self.data = []  # data: T N C
-        print(self.data_dict)
+        #print(self.data_dict)
         for data in self.data_dict:  
             file_name = data['file_name']
             with open(self.nw_DHG14_28_root + self.flag + file_name + '.json', 'r') as f:  
@@ -127,7 +127,7 @@ class Feeder(Dataset):
 
     def top_k(self, score, top_k):
         #assert (all(self.label >= 0))
-        #print("Label:", self.label, len(self.label))
+        #print("Label Count:", len(self.label))
         #label = set(self.label)
         # print(label)
         # print("score:", score, len(score))
