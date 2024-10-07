@@ -11,23 +11,22 @@ class Feeder(Dataset):
                  window_size=150, normalization=False, debug=False, use_mmap=True, nw_DHG14_28_root='data/DHG14-28/DHG14-28_sample_json/'):
         self.nw_DHG14_28_root = nw_DHG14_28_root
         self.idx = idx
-        self.data_dict = []
-        for idx in range(1,20):
-            if 'val' in label_path:  
-                self.train_val = 'val'
-                with open(self.nw_DHG14_28_root + str(self.idx) + '/' + str(self.idx) + 'val_samples.json', 'r') as f1:
-                    json_file = json.load(f1)
-                self.data_dict.append(json_file)
-                self.flag = str(self.idx) + '/val/'
-            else:  
-                self.train_val = 'train'
-                with open(self.nw_DHG14_28_root + str(self.idx) + '/' + str(self.idx) + 'train_samples.json', 'r') as f2:
-                    json_file = json.load(f2)
-                self.data_dict.append(json_file)
-                self.flag = str(self.idx) + '/train/'
+    
+        if 'val' in label_path:  
+            self.train_val = 'val'
+            with open(self.nw_DHG14_28_root + str(self.idx) + '/' + str(self.idx) + 'val_samples.json', 'r') as f1:
+                json_file = json.load(f1)
+            self.data_dict = json_file
+            self.flag = str(self.idx) + '/val/'
+        else:  
+            self.train_val = 'train'
+            with open(self.nw_DHG14_28_root + str(self.idx) + '/' + str(self.idx) + 'train_samples.json', 'r') as f2:
+                json_file = json.load(f2)
+            self.data_dict = json_file
+            self.flag = str(self.idx) + '/train/'
 
         #flatten list
-        self.data_dict = flatten(self.data_dict)
+        #self.data_dict = flatten(self.data_dict)
 
         
         self.bone = [(1, 2), (3, 1), (4, 3), (5, 4), (6, 5), (7, 2), (8, 7), (9, 8), (10, 9), (11, 2), (12, 11),
