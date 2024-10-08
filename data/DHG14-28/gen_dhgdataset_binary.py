@@ -5,7 +5,7 @@ import math
 
 import itertools
 def concatenate_dict_values(dictionary):
-   result = np.array(itertools.chain.from_iterable(dictionary.values()))
+   result = np.array(list(itertools.chain.from_iterable(dictionary.values())))
    return result
 
 root_dataset_path = './DHG14-28_dataset' # 数据集根目录
