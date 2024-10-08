@@ -27,21 +27,21 @@ class Dyn_Model(nn.Module):
     def __init__(self, params):
 
         super(Dyn_Model, self).__init__()
-
-        Cin,Hin,Win=params["shape_in"]
+        Cin=params["channels_in"]
+        Hin,Win=params["shape_in"]
         init_f=params["initial_filters"]
         num_fc1=params["num_fc1"]
         num_classes=params["num_classes"]
         self.dropout_rate=params["dropout_rate"]
 
         # Convolution Layers
-        self.conv1 = nn.Conv2d(Cin, init_f, kernel_size=3)
+        self.conv1 = nn.Conv2d(Cin, init_f, kernel_size=1)
         h,w=findConv2dOutShape(Hin,Win,self.conv1)
-        self.conv2 = nn.Conv2d(init_f, 2*init_f, kernel_size=3)
+        self.conv2 = nn.Conv2d(init_f, 2*init_f, kernel_size=1)
         h,w=findConv2dOutShape(h,w,self.conv2)
-        self.conv3 = nn.Conv2d(2*init_f, 4*init_f, kernel_size=3)
+        self.conv3 = nn.Conv2d(2*init_f, 4*init_f, kernel_size=1)
         h,w=findConv2dOutShape(h,w,self.conv3)
-        self.conv4 = nn.Conv2d(4*init_f, 8*init_f, kernel_size=3)
+        self.conv4 = nn.Conv2d(4*init_f, 8*init_f, kernel_size=1)
         h,w=findConv2dOutShape(h,w,self.conv4)
 
         # compute the flatten size
@@ -52,14 +52,14 @@ class Dyn_Model(nn.Module):
     def forward(self,X):
 
         # Convolution & Pool Layers
-        X = F.relu(self.conv1(X));
-        X = F.max_pool2d(X, 2, 2)
+        X = F.relu(self.conv1(X))
+        X = F.max_pool2d(X, 2,2)
         X = F.relu(self.conv2(X))
-        X = F.max_pool2d(X, 2, 2)
+        X = F.max_pool2d(X, 2,2)
         X = F.relu(self.conv3(X))
-        X = F.max_pool2d(X, 2, 2)
+        X = F.max_pool2d(X, 2,2)
         X = F.relu(self.conv4(X))
-        X = F.max_pool2d(X, 2, 2)
+        X = F.max_pool2d(X, 2,2)
 
         X = X.view(-1, self.num_flatten)
 
@@ -69,8 +69,11 @@ class Dyn_Model(nn.Module):
         return F.log_softmax(X, dim=1)
     
 # Neural Network Predefined Parameters
+T = 22
+
 params_model={
-        "shape_in": (3,46,46),
+        "channels_in": 3,   #3d vectors
+        "shape_in": (T,22),  # T 22 3 ?
         "initial_filters": 8,
         "num_fc1": 100,
         "dropout_rate": 0.25,
@@ -86,4 +89,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = cnn_model.to(device)
 
 
-summary(cnn_model, input_size=(3, 46, 46),device=device.type)
+summary(model, input_size=(3, T, 22), device=device.type)
+
+#TODO: vary T to optimise detector window size.
+#TODO: See if added more layers or a couple seq. blocks might enhance for low cost. dont want more than 100k params ideally
