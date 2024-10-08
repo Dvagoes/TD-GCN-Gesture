@@ -45,6 +45,7 @@ for i in range(Samples_sum): # 遍历每一个样本
     skeleton_data_inactive_pre = skeleton_data[:begin_frame, :] # selects starting inactive frames
     skeleton_data_inactive_pos = skeleton_data[end_frame+1:, :] # selects ending inactive frames
     skeleton_data_inactive = concatenate_dict_values({"pre":skeleton_data_inactive_pre,"post": skeleton_data_inactive_pos})
+    print(skeleton_data_inactive)
     skeleton_data_inactive = skeleton_data_inactive.reshape([(len(skeleton_data) - T), 22, 3])
 
     for skel in skeleton_data_active:
