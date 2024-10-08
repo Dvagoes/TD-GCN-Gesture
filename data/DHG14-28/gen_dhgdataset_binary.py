@@ -54,7 +54,7 @@ for i in range(Samples_sum): # 遍历每一个样本
        skeletons.append({"active": False, "skeleton": skel.tolist()})
 
 print (skeletons)
-skeletons = np.random.shuffle(skeletons)
+np.random.shuffle(skeletons)
 val_split = math.floor(len(skeletons) * 0.25)
 val = skeletons[:val_split]
 train = skeletons[val_split+1:]
