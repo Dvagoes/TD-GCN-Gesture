@@ -23,7 +23,7 @@ num_subject = 20 # subject数
 
 # Generate binary dataset
 
-skeletons = np.array()
+skeletons = []
 
 for i in range(Samples_sum): # 遍历每一个样本
     idx_gesture = sample_txt[i][0] # gesture信息
