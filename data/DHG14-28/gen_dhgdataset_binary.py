@@ -23,7 +23,7 @@ num_subject = 20 # subject数
 
 # Generate binary dataset
 
-skeletons = []
+skeletons = np.array()
 
 for i in range(Samples_sum): # 遍历每一个样本
     idx_gesture = sample_txt[i][0] # gesture信息
@@ -53,6 +53,7 @@ for i in range(Samples_sum): # 遍历每一个样本
     for skel in skeleton_data_inactive:
        skeletons.append({"active": False, "skeleton": skel.tolist()})
 
+print (skeletons)
 skeletons = np.random.shuffle(skeletons)
 val_split = math.floor(len(skeletons) * 0.25)
 val = skeletons[:val_split]
