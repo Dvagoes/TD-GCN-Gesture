@@ -3,6 +3,11 @@ import json
 import os
 import math
 
+import itertools
+def concatenate_dict_values(dictionary):
+   result = list(itertools.chain.from_iterable(dictionary.values()))
+   return result
+
 root_dataset_path = './DHG14-28_dataset' # 数据集根目录
 sample_information_txt = root_dataset_path + '/informations_troncage_sequences.txt' # 样本信息txt文件
 
@@ -39,7 +44,7 @@ for i in range(Samples_sum): # 遍历每一个样本
 
     skeleton_data_inactive_pre = skeleton_data[:begin_frame, :] # selects starting inactive frames
     skeleton_data_inactive_pos = skeleton_data[end_frame+1:, :] # selects ending inactive frames
-    skeleton_data_inactive = np.concatenate(skeleton_data_inactive_pre, skeleton_data_inactive_pos)
+    skeleton_data_inactive = concatenate_dict_values({"pre":skeleton_data_inactive_pre,"post": skeleton_data_inactive_pos})
     skeleton_data_inactive = skeleton_data_inactive.reshape([(len(skeleton_data) - T), 22, 3])
 
     for skel in skeleton_data_active:

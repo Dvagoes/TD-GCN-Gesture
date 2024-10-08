@@ -93,3 +93,123 @@ summary(model, input_size=(3, T, 22), device=device.type)
 
 #TODO: vary T to optimise detector window size.
 #TODO: See if added more layers or a couple seq. blocks might enhance for low cost. dont want more than 100k params ideally
+
+loss_func = nn.NLLLoss(reduction="sum")
+
+from torch import optim
+opt = optim.Adam(cnn_model.parameters(), lr=3e-4)
+lr_scheduler = ReduceLROnPlateau(opt, mode='min',factor=0.5, patience=20,verbose=1)
+
+params_train={
+ "train": train_dl,"val": val_dl,
+ "epochs": 50,
+ "optimiser": optim.Adam(cnn_model.parameters(),
+                         lr=3e-4),
+ "lr_change": ReduceLROnPlateau(opt,
+                                mode='min',
+                                factor=0.5,
+                                patience=20,
+                                verbose=0),
+ "f_loss": nn.NLLLoss(reduction="sum"),
+ "weight_path": "weights.pt",
+ "check": False, 
+}
+
+from tqdm.notebook import trange, tqdm
+
+def train_val(model, params,verbose=False):
+    
+    # Get the parameters
+    epochs=params["epochs"]
+    loss_func=params["f_loss"]
+    opt=params["optimiser"]
+    train_dl=params["train"]
+    val_dl=params["val"]
+    lr_scheduler=params["lr_change"]
+    weight_path=params["weight_path"]
+    
+    loss_history={"train": [],"val": []} # history of loss values in each epoch
+    metric_history={"train": [],"val": []} # histroy of metric values in each epoch
+    best_model_wts = copy.deepcopy(model.state_dict()) # a deep copy of weights for the best performing model
+    best_loss=float('inf') # initialize best loss to a large value
+    
+    ''' Train Model n_epochs '''
+    
+    for epoch in tqdm(range(epochs)):
+        
+        ''' Get the Learning Rate '''
+        current_lr=get_lr(opt)
+        if(verbose):
+            print('Epoch {}/{}, current lr={}'.format(epoch, epochs - 1, current_lr))
+        
+        '''
+        
+        Train Model Process
+        
+        '''
+        
+        model.train()
+        train_loss, train_metric = loss_epoch(model,loss_func,train_dl,opt)
+
+        # collect losses
+        loss_history["train"].append(train_loss)
+        metric_history["train"].append(train_metric)
+        
+        '''
+        
+        Evaluate Model Process
+        
+        '''
+        
+        model.eval()
+        with torch.no_grad():
+            val_loss, val_metric = loss_epoch(model,loss_func,val_dl)
+        
+        # store best model
+        if(val_loss < best_loss):
+            best_loss = val_loss
+            best_model_wts = copy.deepcopy(model.state_dict())
+            
+            # store weights into a local file
+            torch.save(model.state_dict(), weight_path)
+            if(verbose):
+                print("Copied best model weights!")
+        
+        # collect loss and metric for validation dataset
+        loss_history["val"].append(val_loss)
+        metric_history["val"].append(val_metric)
+        
+        # learning rate schedule
+        lr_scheduler.step(val_loss)
+        if current_lr != get_lr(opt):
+            if(verbose):
+                print("Loading best model weights!")
+            model.load_state_dict(best_model_wts) 
+
+        if(verbose):
+            print(f"train loss: {train_loss:.6f}, dev loss: {val_loss:.6f}, accuracy: {100*val_metric:.2f}")
+            print("-"*10) 
+
+    # load best model weights
+    model.load_state_dict(best_model_wts)
+        
+    return model, loss_history, metric_history
+
+
+params_train={
+ "train": train_dl,"val": val_dl,
+ "epochs": 50,
+ "optimiser": optim.Adam(cnn_model.parameters(),lr=3e-4),
+ "lr_change": ReduceLROnPlateau(opt,
+                                mode='min',
+                                factor=0.5,
+                                patience=20,
+                                verbose=0),
+ "f_loss": nn.NLLLoss(reduction="sum"),
+ "weight_path": "weights.pt",
+}
+
+''' Actual Train / Evaluation of CNN Model '''
+# train and validate the model
+
+cnn_model,loss_hist,metric_hist=train_val(cnn_model,params_train)
