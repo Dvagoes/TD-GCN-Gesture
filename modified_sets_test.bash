@@ -1,7 +1,7 @@
 mkdir results/
 for test in active over part_fwd part_bwd shift_fwd shift_bwd vary_reg vary_rnd
 do
-    Python3.9 main.py --config test_${test}.yaml
+    python3.9 main.py --config test_${test}.yaml
     epoch=$(grep -o -E "Epoch number: [0-9]+" /work_dir/temp/log.txt|grep -o -E '[0-9]+')
     mkdir results/test_${test}/${date}
     mv /work_dir/temp/runs-${epoch}-* /results/test_${test}/${date}
