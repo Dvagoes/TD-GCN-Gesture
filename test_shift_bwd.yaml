@@ -12,7 +12,7 @@ train_feeder_args:
   repeat: 5 # 重复
   label_flag: 14 # 14 or 28
   idx: 1
-  nw_DHG14_28_root: data/DHG14-28/DHG14-28_over/ # change to point to relevant dataset for test
+  nw_DHG14_28_root: data/DHG14-28/DHG14-28_shift_bwd/ # change to point to relevant dataset for test
 
 test_feeder_args:
   data_path: joint # 模态
@@ -21,7 +21,7 @@ test_feeder_args:
   random_choose: False
   idx: 1
   label_flag: 14 # 14 or 28
-  nw_DHG14_28_root: data/DHG14-28/DHG14-28_over/
+  nw_DHG14_28_root: data/DHG14-28/DHG14-28_shift_bwd/
 
 # model
 model: model.tdgcn.Model

@@ -49,4 +49,4 @@ warm_up_epoch: 20 # 20
 
 work_dir: ./work_dir/dhg14-28/test
 phase: test
-weights: ./work_dir/dhg14-28/14joint_1/runs-40-16600.pt
+weights: ./results/dhg_active_071024/runs-53-418488.pt
