@@ -1,9 +1,20 @@
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import matplotlib.pyplot as plt
+from plotly.subplots import make_subplots
+import plotly.graph_objs as go
+import copy
+import os
 import torch
+from PIL import Image
+from PIL import Image, ImageDraw
+from torch.utils.data import Dataset
+import torchvision.transforms as transforms
+from torch.utils.data import random_split
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 import torch.nn as nn
-import torch.nn.functional as F
-from torchsummary import summary
-import numpy as np
-import pandas as pd
+from torchvision import utils
+from tqdm.notebook import trange, tqdm
 
 def findConv2dOutShape(hin,win,conv,pool=2):
     # get conv arguments
@@ -96,7 +107,6 @@ summary(model, input_size=(3, T, 22), device=device.type)
 
 loss_func = nn.NLLLoss(reduction="sum")
 
-from torch import optim
 opt = optim.Adam(cnn_model.parameters(), lr=3e-4)
 lr_scheduler = ReduceLROnPlateau(opt, mode='min',factor=0.5, patience=20,verbose=1)
 
@@ -115,7 +125,67 @@ params_train={
  "check": False, 
 }
 
-from tqdm.notebook import trange, tqdm
+def inference(model,dataset,device,num_classes=2):
+    
+    len_data=len(dataset)
+    y_out=torch.zeros(len_data,num_classes) # initialize output tensor on CPU
+    y_gt=np.zeros((len_data),dtype="uint8") # initialize ground truth on CPU
+    model=model.to(device) # move model to device
+    
+    with torch.no_grad():
+        for i in tqdm(range(len_data)):
+            x,y=dataset[i]
+            y_gt[i]=y
+            y_out[i]=model(x.unsqueeze(0).to(device))
+
+    return y_out.numpy(),y_gt 
+
+''' Helper Functions'''
+
+# Function to get the learning rate
+def get_lr(opt):
+    for param_group in opt.param_groups:
+        return param_group['lr']
+
+# Function to compute the loss value per batch of data
+def loss_batch(loss_func, output, target, opt=None):
+    
+    loss = loss_func(output, target) # get loss
+    pred = output.argmax(dim=1, keepdim=True) # Get Output Class
+    metric_b=pred.eq(target.view_as(pred)).sum().item() # get performance metric
+    
+    if opt is not None:
+        opt.zero_grad()
+        loss.backward()
+        opt.step()
+
+    return loss.item(), metric_b
+
+# Compute the loss value & performance metric for the entire dataset (epoch)
+def loss_epoch(model,loss_func,dataset_dl,opt=None):
+    
+    run_loss=0.0 
+    t_metric=0.0
+    len_data=len(dataset_dl.dataset)
+
+    # internal loop over dataset
+    for xb, yb in dataset_dl:
+        # move batch to device
+        xb=xb.to(device)
+        yb=yb.to(device)
+        output=model(xb) # get model output
+        loss_b,metric_b=loss_batch(loss_func, output, yb, opt) # get loss per batch
+        run_loss+=loss_b        # update running loss
+
+        if metric_b is not None: # update running metric
+            t_metric+=metric_b    
+    
+    loss=run_loss/float(len_data)  # average loss value
+    metric=t_metric/float(len_data) # average metric value
+    
+    return loss, metric
+
+
 
 def train_val(model, params,verbose=False):
     

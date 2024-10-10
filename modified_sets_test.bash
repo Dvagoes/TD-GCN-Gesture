@@ -4,10 +4,12 @@ do
     python3.9 main.py --config test_${test}.yaml
     epoch=  53 #$(grep -o -E "Epoch number: [0-9]+" /work_dir/temp/log.txt|grep -o -E '[0-9]+')
     mkdir results/test_${test}/${date}
-    mv work_dir/temp/runs-${epoch}-* results/test_${test}/${date}
-    mv work_dir/temp/epoch${epoch}_test_each_class_acc.csv results/test_${test}/${date}
-    mv work_dir/temp/log.txt results/test_${test}/${date}
+    mv work_dir/dhg14-28/14joint_1/* results/test_${test}/${date}
+    # mv work_dir/temp/runs-${epoch}-* results/test_${test}/${date}
+    # mv work_dir/temp/epoch${epoch}_test_each_class_acc.csv results/test_${test}/${date}
+    # mv work_dir/temp/log.txt results/test_${test}/${date}
     rm work_dir/temp/*
+    rm work_dir/dhg14-28/14joint_1/*
 done
 
 # $ Python3.9 main.py --config test_part_bwd.yaml
