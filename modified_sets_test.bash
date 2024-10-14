@@ -6,6 +6,8 @@ do
     date=$(date '+%d-%m_%H-%M')
     mkdir results/test_${test}/${date}
     mv work_dir/dhg14-28/test/* results/test_${test}/${date}/
+    rm results/dhg_active_071024/runs-53-418488_right.txt
+    rm results/dhg_active_071024/runs-53-418488_wrong.txt
     # mv work_dir/temp/runs-${epoch}-* results/test_${test}/${date}
     # mv work_dir/temp/epoch${epoch}_test_each_class_acc.csv results/test_${test}/${date}
     # mv work_dir/temp/log.txt results/test_${test}/${date}
