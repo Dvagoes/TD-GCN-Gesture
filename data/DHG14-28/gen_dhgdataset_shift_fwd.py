@@ -8,7 +8,7 @@ root_dataset_path = './DHG14-28_dataset' # 数据集根目录
 sample_information_txt = root_dataset_path + '/informations_troncage_sequences.txt' # 样本信息txt文件
 
 try:
-  os.mkdir("DHG14-28_over")
+  os.mkdir("DHG14-28_shift_fwd")
 except OSError as error:
   print(error)
 
@@ -72,27 +72,27 @@ for i in range(Samples_sum): # 遍历每一个样本
     for idx in range(num_subject):
         if idx == int(idx_subject) - 1:
             try:
-              os.mkdir("DHG14-28_over/" + str(idx+1))
+              os.mkdir("DHG14-28_shift_fwd/" + str(idx+1))
             except OSError as error:
               print(error)
             try:
-              os.mkdir("DHG14-28_over/" + str(idx+1)+'/val')
+              os.mkdir("DHG14-28_shift_fwd/" + str(idx+1)+'/val')
             except OSError as error:
               print(error)
-            with open("./DHG14-28_over/" + str(idx+1)+'/val/' \
+            with open("./DHG14-28_shift_fwd/" + str(idx+1)+'/val/' \
                       + file_name + ".json", 'w') as f:
                 json.dump(data_json, f)
             val_data_dict[idx].append(tmp_data_dict)
         else:
             try:
-              os.mkdir("DHG14-28_over/" + str(idx+1))
+              os.mkdir("DHG14-28_shift_fwd//" + str(idx+1))
             except OSError as error:
               print(error)
             try:
-              os.mkdir("DHG14-28_over/" + str(idx+1)+'/train')
+              os.mkdir("DHG14-28_shift_fwd//" + str(idx+1)+'/train')
             except OSError as error:
               print(error)
-            with open("./DHG14-28_over/" + str(idx+1) + '/train/' \
+            with open("./DHG14-28_shift_fwd//" + str(idx+1) + '/train/' \
                       + file_name + ".json", 'w') as f:
                 json.dump(data_json, f)
             train_data_dict[idx].append(tmp_data_dict)
@@ -100,11 +100,11 @@ for i in range(Samples_sum): # 遍历每一个样本
 
 for idx in range(num_subject):
     try:
-      os.mkdir("DHG14-28_over/" + str(idx + 1))
+      os.mkdir("DHG14-28_shift_fwd//" + str(idx + 1))
     except OSError as error:
       print(error)
-    with open("./DHG14-28_over/" + str(idx + 1) + "/" + str(idx + 1) + "train_samples.json", 'w') as t1:
+    with open("./DHG14-28_shift_fwd/" + str(idx + 1) + "/" + str(idx + 1) + "train_samples.json", 'w') as t1:
         json.dump(train_data_dict[idx], t1)
 
-    with open("./DHG14-28_over/" + str(idx + 1) + "/" + str(idx + 1) + "val_samples.json", 'w') as t2:
+    with open("./DHG14-28_shift_fwd/" + str(idx + 1) + "/" + str(idx + 1) + "val_samples.json", 'w') as t2:
         json.dump(val_data_dict[idx], t2)
